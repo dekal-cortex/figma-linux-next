@@ -4,56 +4,60 @@ export class ZenityDialogs implements ProviderDialog {
   constructor() {}
 
   public showMessageBox = async (options: Dialogs.MessageBoxOptions) => {
-    const cmd = [`zenity --${options.type} --ellipsize`];
+    const args = [`--${options.type}`, "--ellipsize"];
 
     if (options.title) {
-      cmd.push(`--title="${options.title}"`);
+      args.push("--title", options.title);
     }
     if (options.detail) {
-      cmd.push(`--text="${options.message}\n${options.detail}"`);
+      args.push("--text", `${options.message}\n${options.detail}`);
+    } else {
+      args.push("--text", options.message);
     }
     if (options.textOkButton) {
-      cmd.push(`--ok-label="${options.textOkButton}"`);
+      args.push("--ok-label", options.textOkButton);
     }
     if (options.type === "question") {
       if (options.textCancelButton) {
-        cmd.push(`--cancel-label="${options.textCancelButton}"`);
+        args.push("--cancel-label", options.textCancelButton);
       }
       if (options.defaultFocusedButton === "Cancel") {
-        cmd.push(`--default-cancel`);
+        args.push("--default-cancel");
       }
     }
 
     try {
-      await process.exec(cmd.join(" "));
+      await process.execFile("zenity", args);
       return 0;
     } catch (error) {
       return 1;
     }
   };
   public showMessageBoxSync = (options: Dialogs.MessageBoxOptions) => {
-    const cmd = [`zenity --${options.type} --ellipsize`];
+    const args = [`--${options.type}`, "--ellipsize"];
 
     if (options.title) {
-      cmd.push(`--title="${options.title}"`);
+      args.push("--title", options.title);
     }
     if (options.detail) {
-      cmd.push(`--text="${options.message}\n${options.detail}"`);
+      args.push("--text", `${options.message}\n${options.detail}`);
+    } else {
+      args.push("--text", options.message);
     }
     if (options.textOkButton) {
-      cmd.push(`--ok-label="${options.textOkButton}"`);
+      args.push("--ok-label", options.textOkButton);
     }
     if (options.type === "question") {
       if (options.textCancelButton) {
-        cmd.push(`--cancel-label="${options.textCancelButton}"`);
+        args.push("--cancel-label", options.textCancelButton);
       }
       if (options.defaultFocusedButton === "Cancel") {
-        cmd.push(`--default-cancel`);
+        args.push("--default-cancel");
       }
     }
 
     try {
-      process.execSync(cmd.join(" "));
+      process.execFileSync("zenity", args);
       return 0;
     } catch (error) {
       return 1;
@@ -61,20 +65,20 @@ export class ZenityDialogs implements ProviderDialog {
   };
 
   public showOpenDialog = async (options: Dialogs.OpenOptions) => {
-    const cmd = ["zenity --file-selection"];
+    const args = ["--file-selection"];
 
     if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
+      args.push("--filename", options.defaultPath);
     }
     if (Array.isArray(options.properties) && options.properties.length > 0) {
       for (const prop of options.properties) {
         switch (prop) {
           case "openDirectory": {
-            cmd.push(`--directory`);
+            args.push("--directory");
             break;
           }
           case "multiSelections": {
-            cmd.push(`--multiple`);
+            args.push("--multiple");
             break;
           }
         }
@@ -83,7 +87,7 @@ export class ZenityDialogs implements ProviderDialog {
 
     let result: string[] | undefined;
     try {
-      const stdout = await process.exec(cmd.join(" "));
+      const stdout = await process.execFile("zenity", args);
       result = stdout.replace(/\n/, "").split("|");
     } catch (error) {
       return null;
@@ -92,20 +96,20 @@ export class ZenityDialogs implements ProviderDialog {
     return result;
   };
   public showOpenDialogSync = (options: Dialogs.OpenOptions) => {
-    const cmd = ["zenity --file-selection"];
+    const args = ["--file-selection"];
 
     if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
+      args.push("--filename", options.defaultPath);
     }
     if (Array.isArray(options.properties) && options.properties.length > 0) {
       for (const prop of options.properties) {
         switch (prop) {
           case "openDirectory": {
-            cmd.push(`--directory`);
+            args.push("--directory");
             break;
           }
           case "multiSelections": {
-            cmd.push(`--multiple`);
+            args.push("--multiple");
             break;
           }
         }
@@ -114,7 +118,7 @@ export class ZenityDialogs implements ProviderDialog {
 
     let result: string[] | undefined;
     try {
-      const stdout = process.execSync(cmd.join(" "));
+      const stdout = process.execFileSync("zenity", args);
       result = stdout.replace(/\n/, "").split("|");
     } catch (error) {
       return null;
@@ -124,15 +128,15 @@ export class ZenityDialogs implements ProviderDialog {
   };
 
   public showSaveDialog = async (options: Dialogs.SaveOptions) => {
-    const cmd = ["zenity --file-selection --save --confirm-overwrite"];
+    const args = ["--file-selection", "--save", "--confirm-overwrite"];
 
     if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
+      args.push("--filename", options.defaultPath);
     }
 
     let result: string | undefined;
     try {
-      result = await process.exec(cmd.join(" "));
+      result = await process.execFile("zenity", args);
       result = result.replace(/\n/, "");
     } catch (error) {
       return null;
@@ -141,15 +145,15 @@ export class ZenityDialogs implements ProviderDialog {
     return result;
   };
   public showSaveDialogSync = (options: Dialogs.SaveOptions) => {
-    const cmd = ["zenity --file-selection --save --confirm-overwrite"];
+    const args = ["--file-selection", "--save", "--confirm-overwrite"];
 
     if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
+      args.push("--filename", options.defaultPath);
     }
 
     let result: string | undefined;
     try {
-      result = process.execSync(cmd.join(" "));
+      result = process.execFileSync("zenity", args);
       result = result.replace(/\n/, "");
     } catch (error) {
       return null;
