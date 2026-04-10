@@ -1,4 +1,4 @@
-import { app, shell, clipboard, Menu, MenuItemConstructorOptions, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, clipboard } from "electron";
 
 import { storage } from "Main/Storage";
 import { MENU_WIDTH, LINKS } from "Const";
@@ -123,7 +123,7 @@ export default class MenuManager {
         id: "openInBrowser",
         label: "Open in Browser",
         click: (): void => {
-          shell.openExternal(url);
+          openExternalSafe(url);
         },
       },
       { type: "separator" },
@@ -166,7 +166,7 @@ export default class MenuManager {
         id: "openInBrowser",
         label: "Open in Browser",
         click: (): void => {
-          shell.openExternal(url);
+          openExternalSafe(url);
         },
       },
       { type: "separator" },
@@ -235,7 +235,7 @@ export default class MenuManager {
     return {
       label: `${label} ↗`,
       click() {
-        shell.openExternal(url);
+        openExternalSafe(url);
       },
     };
   }

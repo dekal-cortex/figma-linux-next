@@ -11,7 +11,7 @@ import {
   WebContentsViewConstructorOptions,
 } from "electron";
 
-import { preloadScriptPathDev, preloadScriptPathProd } from "Utils/Main";
+import { preloadScriptPathDev, preloadScriptPathProd, openExternalSafe } from "Utils/Main";
 import {
   isDev,
   isFigmaUrl,
@@ -56,7 +56,7 @@ export default class Tab {
       webPreferences: {
         nodeIntegration: false,
         webgl: true,
-        contextIsolation: false,
+        contextIsolation: true,
         zoomFactor: 1,
         preload: isDev ? preloadScriptPathDev : preloadScriptPathProd,
       },
@@ -90,7 +90,7 @@ export default class Tab {
     }
 
     if (isFigmaDocLink(newUrl)) {
-      shell.openExternal(newUrl);
+      openExternalSafe(newUrl);
 
       event.preventDefault();
       return;
@@ -126,7 +126,7 @@ export default class Tab {
       return;
     }
 
-    shell.openExternal(url);
+    openExternalSafe(url);
   }
 
   private permissionHandler(
@@ -192,7 +192,7 @@ export default class Tab {
     if (isFigmaRunUrl(url)) {
       app.emit("openUrlInNewTab", url);
     } else {
-      shell.openExternal(url);
+      openExternalSafe(url);
     }
 
     return { action: "deny" as const };

@@ -8,7 +8,7 @@ import {
   DidCreateWindowDetails,
 } from "electron";
 
-import { preloadScriptPathDev, preloadScriptPathProd, toggleDetachedDevTools } from "Utils/Main";
+import { preloadScriptPathDev, preloadScriptPathProd, toggleDetachedDevTools, openExternalSafe } from "Utils/Main";
 import { isDev, isFigmaRunUrl, isRecentFilesLink, isFigmaUrl } from "Utils/Common";
 import { storage } from "Main/Storage";
 import { logger } from "Main/Logger";
@@ -40,7 +40,7 @@ export default class CommunityTab {
       webPreferences: {
         nodeIntegration: false,
         webgl: true,
-        contextIsolation: false,
+        contextIsolation: true,
         zoomFactor: 1,
         preload: isDev ? preloadScriptPathDev : preloadScriptPathProd,
       },
@@ -67,7 +67,7 @@ export default class CommunityTab {
       return;
     }
 
-    shell.openExternal(url);
+    openExternalSafe(url);
   }
   private onDomReady(_event: any) {}
   private windowOpenHandler(details: HandlerDetails) {
@@ -76,7 +76,7 @@ export default class CommunityTab {
     if (isFigmaRunUrl(url)) {
       app.emit("openUrlFromCommunity", url);
     } else {
-      shell.openExternal(url);
+      openExternalSafe(url);
     }
 
     return { action: "deny" as const };
@@ -93,7 +93,7 @@ export default class CommunityTab {
       return;
     }
 
-    shell.openExternal(url);
+    openExternalSafe(url);
   }
 
   private registerEvents() {
