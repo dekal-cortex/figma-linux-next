@@ -2,7 +2,7 @@
  * AuthController — handles authentication-related IPC channels.
  */
 import type { IpcMainEvent } from "electron";
-import { session, shell } from "electron";
+import { app, session } from "electron";
 
 import * as Const from "Const";
 import { request } from "Utils/Main";
@@ -38,7 +38,7 @@ export default class AuthController {
     if (isAppAuthGrandLink(data.grantPath)) {
       const url = `${Const.HOMEPAGE}${data.grantPath}?desktop_protocol=figma`;
 
-      shell.openExternal(url);
+      openExternalSafe(url);
     }
   }
 

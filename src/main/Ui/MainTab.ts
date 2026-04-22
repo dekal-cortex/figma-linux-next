@@ -37,7 +37,7 @@ export default class MainTab {
     webPreferences: {
       nodeIntegration: false,
       webgl: true,
-      contextIsolation: false,
+      contextIsolation: true,
       zoomFactor: 1,
       preload: isDev ? preloadMainScriptPathDev : preloadMainScriptPathProd,
     },
@@ -136,7 +136,7 @@ export default class MainTab {
     }
 
     if (isFigmaDocLink(url)) {
-      shell.openExternal(url);
+      openExternalSafe(url);
       event.preventDefault();
       return;
     }
@@ -166,7 +166,7 @@ export default class MainTab {
       return;
     }
 
-    shell.openExternal(url);
+    openExternalSafe(url);
   }
 
   private windowOpenHandler(details: HandlerDetails) {

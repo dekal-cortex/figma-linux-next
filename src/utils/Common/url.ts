@@ -110,3 +110,9 @@ export const getFileKeyFromUrl = (url: string): string | null => {
 
   return null;
 };
+
+export const isValidExternalUrl = (url: string): boolean => {
+  const parsed = parseURL(url);
+  if (!parsed) return false;
+  return ["http:", "https:", "mailto:"].includes(parsed.protocol);
+};
