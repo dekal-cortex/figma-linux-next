@@ -660,16 +660,25 @@ const VARIABLE_DEFS_SCRIPT = (nodeId: string | null) => `
     }
 
     // Selection-based collection
+    const seenVariables = new Set();
+    const seenStyles = new Set();
+    const collectionsCache = new Map();
+
     function collectVariables(node) {
       if ('boundVariables' in node && node.boundVariables) {
         for (const [prop, binding] of Object.entries(node.boundVariables)) {
           try {
             const bindings = Array.isArray(binding) ? binding : [binding];
             for (const b of bindings) {
-              if (b && b.id) {
+              if (b && b.id && !seenVariables.has(b.id)) {
+                seenVariables.add(b.id);
                 const v = figma.variables.getVariableById(b.id);
                 if (v && !variables[v.id]) {
-                  const collection = figma.variables.getVariableCollectionById(v.variableCollectionId);
+                  let collection = collectionsCache.get(v.variableCollectionId);
+                  if (collection === undefined) {
+                    collection = figma.variables.getVariableCollectionById(v.variableCollectionId);
+                    collectionsCache.set(v.variableCollectionId, collection);
+                  }
                   variables[v.id] = {
                     name: v.name,
                     type: v.resolvedType,
@@ -694,16 +703,20 @@ const VARIABLE_DEFS_SCRIPT = (nodeId: string | null) => `
       const styleProps = ['fillStyleId', 'strokeStyleId', 'textStyleId', 'effectStyleId', 'gridStyleId'];
       for (const prop of styleProps) {
         if (prop in node && node[prop] && typeof node[prop] === 'string') {
-          try {
-            const style = figma.getStyleById(node[prop]);
-            if (style && !styles[style.id]) {
-              styles[style.id] = {
-                name: style.name,
-                type: style.type,
-                description: style.description || null,
-              };
-            }
-          } catch(e) {}
+          const styleId = node[prop];
+          if (!seenStyles.has(styleId)) {
+            seenStyles.add(styleId);
+            try {
+              const style = figma.getStyleById(styleId);
+              if (style && !styles[style.id]) {
+                styles[style.id] = {
+                  name: style.name,
+                  type: style.type,
+                  description: style.description || null,
+                };
+              }
+            } catch(e) {}
+          }
         }
       }
 
