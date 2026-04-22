@@ -1,5 +1,10 @@
 import { promisify } from "util";
-import { exec as cp_exec, execSync } from "child_process";
+import {
+  exec as cp_exec,
+  execSync as cp_execSync,
+  execFile as cp_execFile,
+  execFileSync as cp_execFileSync,
+} from "child_process";
 
 import { logger } from "./Logger";
 
@@ -20,7 +25,26 @@ export class Process {
   };
 
   public execSync = (command: string): string => {
-    const result = execSync(command);
+    const result = cp_execSync(command);
+
+    return result.toString();
+  };
+
+  public execFile = async (file: string, args: string[]): Promise<string> => {
+    const execFile = promisify(cp_execFile);
+
+    const result = await execFile(file, args);
+
+    if (result.stderr !== "") {
+      logger.error(`Exec file: "${file} ${args.join(" ")}" fails with error: `, result.stderr);
+      throw new Error(`Exec file: "${file} ${args.join(" ")}" fails with error: ${result.stderr}`);
+    }
+
+    return result.stdout;
+  };
+
+  public execFileSync = (file: string, args: string[]): string => {
+    const result = cp_execFileSync(file, args);
 
     return result.toString();
   };
